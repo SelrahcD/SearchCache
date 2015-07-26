@@ -9,4 +9,11 @@ interface KeyGenerator
      * @return string
      */
     public function generatePrivateKey($params, $results);
+
+    /**
+     * Generate the key based on search params
+     * @param $params
+     * @return string
+     */
+    public function generateSharedKey($params);
 }

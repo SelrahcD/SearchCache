@@ -14,7 +14,7 @@ class HashKeyGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->keyGenerator = new HashKeyGenerator();
     }
 
-    public function testReturnsSameKeyIfSearchParametersAndResultsAreTheSame()
+    public function testGeneratePrivateKeyReturnsSameKeyIfSearchParametersAndResultsAreTheSame()
     {
         $params = [
             'name' => 'test',
@@ -29,7 +29,7 @@ class HashKeyGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($key1, $key2);
     }
 
-    public function testReturnsDifferentKeyIfSearchParametersArentTheSame()
+    public function testGeneratePrivateKeyReturnsDifferentKeyIfSearchParametersArentTheSame()
     {
         $params1 = [
             'name' => 'test',
@@ -49,7 +49,7 @@ class HashKeyGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEquals($key1, $key2);
     }
 
-    public function testReturnsDifferentKeyIfSearchResultArentTheSame()
+    public function testGeneratePrivateKeyReturnsDifferentKeyIfSearchResultArentTheSame()
     {
         $params = [
             'name' => 'test',
@@ -65,7 +65,7 @@ class HashKeyGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEquals($key1, $key2);
     }
 
-    public function testReturnsDifferentKeyIfSearchResultsArentInTheSameOrder()
+    public function testGeneratePrivateKeyReturnsDifferentKeyIfSearchResultsArentInTheSameOrder()
     {
         $params = [
             'name' => 'test',
@@ -78,6 +78,37 @@ class HashKeyGeneratorTest extends \PHPUnit_Framework_TestCase
         $key1 = $this->keyGenerator->generatePrivateKey($params, $results1);
         $key2 = $this->keyGenerator->generatePrivateKey($params, $results2);
 
+
+        $this->assertNotEquals($key1, $key2);
+    }
+
+    public function testGenerateSharedKeyReturnsSameKeyIfParamsAreEquals()
+    {
+        $params = [
+            'name' => 'test',
+            'age'  => 12,
+        ];
+
+        $key1 = $this->keyGenerator->generateSharedKey($params);
+        $key2 = $this->keyGenerator->generateSharedKey($params);
+
+        $this->assertEquals($key1, $key2);
+    }
+
+    public function testGenerateSharedKeyReturnsDifferentKeysIfParamsArentEquals()
+    {
+        $params1 = [
+            'name' => 'test',
+            'age'  => 12,
+        ];
+
+        $params2 = [
+            'name' => 'test',
+            'age'  => 20,
+        ];
+
+        $key1 = $this->keyGenerator->generateSharedKey($params1);
+        $key2 = $this->keyGenerator->generateSharedKey($params2);
 
         $this->assertNotEquals($key1, $key2);
     }

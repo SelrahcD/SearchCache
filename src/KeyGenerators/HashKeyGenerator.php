@@ -14,4 +14,14 @@ final class HashKeyGenerator implements KeyGenerator
     {
         return md5(serialize($params) . serialize($results));
     }
+
+    /**
+     * Generate the key based on search params
+     * @param $params
+     * @return string
+     */
+    public function generateSharedKey($params)
+    {
+        return md5(serialize($params));
+    }
 }
