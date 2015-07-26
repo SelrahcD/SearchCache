@@ -3,6 +3,7 @@
 namespace SelrahcD\SearchCache\Tests;
 
 use Mockery\Mock;
+use SelrahcD\SearchCache\KeyGenerators\KeyGenerator;
 use SelrahcD\SearchCache\SearchCache;
 use SelrahcD\SearchCache\SearchResultStores\SearchResultsStore;
 
@@ -16,6 +17,8 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
      */
     private $searchCache;
 
+    private $keyGenerator;
+
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
@@ -23,7 +26,8 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->searchResultStore = \Mockery::mock(SearchResultsStore::class);
-        $this->searchCache = new SearchCache($this->searchResultStore);
+        $this->keyGenerator = \Mockery::mock(KeyGenerator::class);
+        $this->searchCache = new SearchCache($this->searchResultStore, $this->keyGenerator);
     }
 
     /**
@@ -35,83 +39,6 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
         \Mockery::close();
     }
 
-
-    public function testStoreReturnsSameKeyIfSearchParametersAndResultsAreTheSame()
-    {
-        $params = [
-            'name' => 'test',
-            'age'  => 12,
-        ];
-
-        $results = [1, 'AA', 3, "HUG76767"];
-
-        $this->searchResultStore->shouldReceive('store');
-
-        $key1 = $this->searchCache->store($params, $results);
-        $key2 = $this->searchCache->store($params, $results);
-
-        $this->assertEquals($key1, $key2);
-    }
-
-    public function testStoreReturnsDifferentKeyIfSearchParametersArentTheSame()
-    {
-        $params1 = [
-            'name' => 'test',
-            'age'  => 12,
-        ];
-
-        $params2 = [
-            'name' => 'test2',
-            'age'  => 12,
-        ];
-
-        $results = [1, 'AA', 3, "HUG76767"];
-
-        $this->searchResultStore->shouldReceive('store');
-
-        $key1 = $this->searchCache->store($params1, $results);
-        $key2 = $this->searchCache->store($params2, $results);
-
-        $this->assertNotEquals($key1, $key2);
-    }
-
-    public function testStoreReturnsDifferentKeyIfSearchResultArentTheSame()
-    {
-        $params = [
-            'name' => 'test',
-            'age'  => 12,
-        ];
-
-        $results1 = [1, 'AA', 3, "HUG76767"];
-        $results2 = [1, 'AA'];
-
-        $this->searchResultStore->shouldReceive('store');
-
-        $key1 = $this->searchCache->store($params, $results1);
-        $key2 = $this->searchCache->store($params, $results2);
-
-        $this->assertNotEquals($key1, $key2);
-    }
-
-    public function testStoreReturnsDifferentKeyIfSearchResultsArentInTheSameOrder()
-    {
-        $params = [
-            'name' => 'test',
-            'age'  => 12,
-        ];
-
-        $results1 = [1, 'AA', 3, "HUG76767"];
-        $results2 = [1, 'AA', "HUG76767", 3];
-
-        $this->searchResultStore->shouldReceive('store');
-
-        $key1 = $this->searchCache->store($params, $results1);
-        $key2 = $this->searchCache->store($params, $results2);
-
-
-        $this->assertNotEquals($key1, $key2);
-    }
-
     public function testStoreRecordsResults()
     {
         $params = [
@@ -120,6 +47,9 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
         ];
 
         $results = [1, 'AA', 3, "HUG76767"];
+
+        $this->keyGenerator
+            ->shouldReceive('generateKey');
 
         $this->searchResultStore->shouldReceive('store')->once();
         $key = $this->searchCache->store($params, $results);
@@ -133,6 +63,30 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
             );
 
         $this->searchCache->store($params, $results);
+    }
+
+    public function testStoreReturnsKey()
+    {
+        $params = [
+            'name' => 'test',
+            'age'  => 12,
+        ];
+
+        $results = [1, 'AA', 3, "HUG76767"];
+
+        $this->keyGenerator
+            ->shouldReceive('generateKey')
+            ->with(\Mockery::mustBe($params),
+                \Mockery::mustBe($results))
+            ->andReturn('aKey');
+
+        $this->searchResultStore->shouldReceive('store')->once();
+        $key = $this->searchCache->store($params, $results);
+
+        $this->searchResultStore
+            ->shouldReceive('store');
+
+        $this->assertEquals('aKey', $this->searchCache->store($params, $results));
     }
 
     public function testGetResultsReturnsResultsAssociatedWithKey()

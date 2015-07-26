@@ -2,6 +2,7 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
+use SelrahcD\SearchCache\KeyGenerators\HashKeyGenerator;
 use SelrahcD\SearchCache\SearchCache;
 use SelrahcD\SearchCache\SearchResultStores\PredisSearchResultStore;
 use Pagerfanta\Adapter\ArrayAdapter;
@@ -12,7 +13,8 @@ $redisConf = include __DIR__ . '/redisconf.php';
 $client = new Predis\Client($redisConf);
 
 $predisSearchStore = new PredisSearchResultStore($client);
-$searchCache = new SearchCache($predisSearchStore);
+$keyGenerator = new HashKeyGenerator();
+$searchCache = new SearchCache($predisSearchStore, $keyGenerator);
 $peopleStore = new PeopleStore();
 
 if (!empty($_GET['search'])) {
@@ -47,7 +49,7 @@ $people = $peopleStore->getByIds($peopleIds);
 # DISPLAY
 echo '<h1>People (' . $pagerfanta->getNbResults() . ')</h1>';
 ?>
-    <form action="index.php" method="POST">
+    <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="POST">
         <label>Age: <input type="number" name="age"></label>
         <input type="submit" value="Search" name="submit">
     </form>

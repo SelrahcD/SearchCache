@@ -1,5 +1,7 @@
 <?php
-namespace  SelrahcD\SearchCache;
+namespace SelrahcD\SearchCache;
+
+use SelrahcD\SearchCache\KeyGenerators\KeyGenerator;
 use SelrahcD\SearchCache\SearchResultStores\SearchResultsStore;
 
 final class SearchCache
@@ -10,12 +12,18 @@ final class SearchCache
     private $searchResultsStore;
 
     /**
+     * @var KeyGenerator
+     */
+    private $keyGenerator;
+
+    /**
      * SearchCache constructor.
      * @param SearchResultsStore $searchResultsStore
      */
-    public function __construct(SearchResultsStore $searchResultsStore)
+    public function __construct(SearchResultsStore $searchResultsStore, KeyGenerator $keyGenerator)
     {
         $this->searchResultsStore = $searchResultsStore;
+        $this->keyGenerator = $keyGenerator;
     }
 
     /**
@@ -26,22 +34,11 @@ final class SearchCache
      */
     public function store(array $params, array $results)
     {
-        $key = $this->generateKey($params, $results);
+        $key = $this->keyGenerator->generateKey($params, $results);
 
         $this->searchResultsStore->store($key, $results);
 
         return $key;
-    }
-
-    /**
-     * Generates the key based on search params and results
-     * @param array $params
-     * @param array $results
-     * @return string
-     */
-    private function generateKey(array $params, array $results)
-    {
-        return md5(serialize($params) . serialize($results));
     }
 
     /**
