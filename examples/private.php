@@ -28,7 +28,7 @@ if (!empty($_GET['search'])) {
 
     $peopleIds = $peopleStore->search($searchParams);
 
-    $search = $searchCache->store($searchParams, $peopleIds);
+    $search = $searchCache->storeResult($searchParams, $peopleIds);
 } else {
     $peopleIds = $peopleStore->getAllIds();
 }
