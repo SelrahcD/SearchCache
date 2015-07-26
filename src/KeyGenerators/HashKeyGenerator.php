@@ -10,7 +10,7 @@ final class HashKeyGenerator implements KeyGenerator
      * @param array $results
      * @return string
      */
-    public function generateKey($params, $results)
+    public function generatePrivateKey($params, $results)
     {
         return md5(serialize($params) . serialize($results));
     }

@@ -8,5 +8,5 @@ interface KeyGenerator
      * @param array $results
      * @return string
      */
-    public function generateKey($params, $results);
+    public function generatePrivateKey($params, $results);
 }

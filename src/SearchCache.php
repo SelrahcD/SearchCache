@@ -19,6 +19,7 @@ final class SearchCache
     /**
      * SearchCache constructor.
      * @param SearchResultsStore $searchResultsStore
+     * @param KeyGenerator $keyGenerator
      */
     public function __construct(SearchResultsStore $searchResultsStore, KeyGenerator $keyGenerator)
     {
@@ -34,7 +35,7 @@ final class SearchCache
      */
     public function store(array $params, array $results)
     {
-        $key = $this->keyGenerator->generateKey($params, $results);
+        $key = $this->keyGenerator->generatePrivateKey($params, $results);
 
         $this->searchResultsStore->store($key, $results);
 

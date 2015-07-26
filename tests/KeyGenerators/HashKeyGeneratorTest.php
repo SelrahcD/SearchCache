@@ -23,8 +23,8 @@ class HashKeyGeneratorTest extends \PHPUnit_Framework_TestCase
 
         $results = [1, 'AA', 3, "HUG76767"];
 
-        $key1 = $this->keyGenerator->generateKey($params, $results);
-        $key2 = $this->keyGenerator->generateKey($params, $results);
+        $key1 = $this->keyGenerator->generatePrivateKey($params, $results);
+        $key2 = $this->keyGenerator->generatePrivateKey($params, $results);
 
         $this->assertEquals($key1, $key2);
     }
@@ -43,8 +43,8 @@ class HashKeyGeneratorTest extends \PHPUnit_Framework_TestCase
 
         $results = [1, 'AA', 3, "HUG76767"];
 
-        $key1 = $this->keyGenerator->generateKey($params1, $results);
-        $key2 = $this->keyGenerator->generateKey($params2, $results);
+        $key1 = $this->keyGenerator->generatePrivateKey($params1, $results);
+        $key2 = $this->keyGenerator->generatePrivateKey($params2, $results);
 
         $this->assertNotEquals($key1, $key2);
     }
@@ -59,8 +59,8 @@ class HashKeyGeneratorTest extends \PHPUnit_Framework_TestCase
         $results1 = [1, 'AA', 3, "HUG76767"];
         $results2 = [1, 'AA'];
 
-        $key1 = $this->keyGenerator->generateKey($params, $results1);
-        $key2 = $this->keyGenerator->generateKey($params, $results2);
+        $key1 = $this->keyGenerator->generatePrivateKey($params, $results1);
+        $key2 = $this->keyGenerator->generatePrivateKey($params, $results2);
 
         $this->assertNotEquals($key1, $key2);
     }
@@ -75,8 +75,8 @@ class HashKeyGeneratorTest extends \PHPUnit_Framework_TestCase
         $results1 = [1, 'AA', 3, "HUG76767"];
         $results2 = [1, 'AA', "HUG76767", 3];
 
-        $key1 = $this->keyGenerator->generateKey($params, $results1);
-        $key2 = $this->keyGenerator->generateKey($params, $results2);
+        $key1 = $this->keyGenerator->generatePrivateKey($params, $results1);
+        $key2 = $this->keyGenerator->generatePrivateKey($params, $results2);
 
 
         $this->assertNotEquals($key1, $key2);

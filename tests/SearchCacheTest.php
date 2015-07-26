@@ -49,7 +49,7 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
         $results = [1, 'AA', 3, "HUG76767"];
 
         $this->keyGenerator
-            ->shouldReceive('generateKey');
+            ->shouldReceive('generatePrivateKey');
 
         $this->searchResultStore->shouldReceive('store')->once();
         $key = $this->searchCache->store($params, $results);
@@ -75,7 +75,7 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
         $results = [1, 'AA', 3, "HUG76767"];
 
         $this->keyGenerator
-            ->shouldReceive('generateKey')
+            ->shouldReceive('generatePrivateKey')
             ->with(\Mockery::mustBe($params),
                 \Mockery::mustBe($results))
             ->andReturn('aKey');
