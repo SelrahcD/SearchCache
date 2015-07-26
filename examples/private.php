@@ -65,7 +65,7 @@ if ($pagerfanta->hasPreviousPage()) {
     if(isset($search)) {
         $params .= '&search=' . $search;
     }
-    echo '<a href="index.php' .$params. '">Previous Page</a><br />';
+    echo '<a href="' . $_SERVER['PHP_SELF'] . $params . '">Previous Page</a><br />';
 }
 
 if ($pagerfanta->hasNextPage()) {
@@ -73,5 +73,5 @@ if ($pagerfanta->hasNextPage()) {
     if(isset($search)) {
         $params .= '&search=' . $search;
     }
-    echo '<a href="index.php' .$params. '">Next Page</a>';
+    echo '<a href="' . $_SERVER['PHP_SELF'] . $params . '">Next Page</a>';
 }
