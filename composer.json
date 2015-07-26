@@ -1,0 +1,44 @@
+{
+  "name": "SelrahcD/SearchCache",
+  "description": "Caches search results",
+  "keywords": [
+    "search", "cache"
+  ],
+  "homepage": "https://github.com/selrahcd/searchcache",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": ":Desneuf Charles",
+      "homepage": "http://www.chorip.am"
+    }
+  ],
+  "require": {
+    "php" : ">=5.4.0",
+    "predis/predis": "~1.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit" : "4.*",
+    "mockery/mockery": "0.9.*",
+    "fzaninotto/faker": "~1.5",
+    "pagerfanta/pagerfanta": "~1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "SelrahcD\\SearchCache\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "SelrahcD\\SearchCache\\Test\\": "tests"
+    },
+    "files": [
+      "examples/PeopleStore.php"
+
+    ]
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "0.1-dev"
+    }
+  }
+}
