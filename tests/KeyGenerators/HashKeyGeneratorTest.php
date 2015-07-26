@@ -82,6 +82,27 @@ class HashKeyGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEquals($key1, $key2);
     }
 
+    public function testGeneratePrivateKeyReturnsSameKeyIfParametersArentInTheSameOrder()
+    {
+        $params1 = [
+            'name' => 'test',
+            'age'  => 12,
+        ];
+
+        $params2 = [
+            'age'  => 12,
+            'name' => 'test',
+        ];
+
+        $results = [1, 'AA', 3, "HUG76767"];
+
+        $key1 = $this->keyGenerator->generatePrivateKey($params1, $results);
+        $key2 = $this->keyGenerator->generatePrivateKey($params2, $results);
+
+
+        $this->assertEquals($key1, $key2);
+    }
+
     public function testGenerateSharedKeyReturnsSameKeyIfParamsAreEquals()
     {
         $params = [
@@ -91,6 +112,24 @@ class HashKeyGeneratorTest extends \PHPUnit_Framework_TestCase
 
         $key1 = $this->keyGenerator->generateSharedKey($params);
         $key2 = $this->keyGenerator->generateSharedKey($params);
+
+        $this->assertEquals($key1, $key2);
+    }
+
+    public function testGenerateSharedKeyReturnsSameKeyIfParamsArentInTheSameOrder()
+    {
+        $params1 = [
+            'name' => 'test',
+            'age'  => 12,
+        ];
+
+        $params2 = [
+            'age'  => 12,
+            'name' => 'test',
+        ];
+
+        $key1 = $this->keyGenerator->generateSharedKey($params1);
+        $key2 = $this->keyGenerator->generateSharedKey($params2);
 
         $this->assertEquals($key1, $key2);
     }

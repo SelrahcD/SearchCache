@@ -12,6 +12,8 @@ final class HashKeyGenerator implements KeyGenerator
      */
     public function generatePrivateKey($params, $results)
     {
+        $this->orderParameters($params);
+
         return md5(serialize($params) . serialize($results));
     }
 
@@ -22,6 +24,13 @@ final class HashKeyGenerator implements KeyGenerator
      */
     public function generateSharedKey($params)
     {
+        $this->orderParameters($params);
+
         return md5(serialize($params));
+    }
+
+    private function orderParameters(array &$params)
+    {
+        ksort($params);
     }
 }
