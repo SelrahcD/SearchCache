@@ -76,7 +76,7 @@ final class SearchCache
     {
         $key = $this->keyGenerator->generateSharedKey($params);
 
-        $result = $this->searchResultsStore->getResult($key);;
+        $result = $this->searchResultsStore->getResult($key);
 
         $newKey = $this->keyGenerator->createCopyOfKey($key);
 
