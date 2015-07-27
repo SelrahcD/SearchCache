@@ -151,4 +151,9 @@ class HashKeyGeneratorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNotEquals($key1, $key2);
     }
+
+    public function testCreateCopyOfKeyReturnsADifferentKey()
+    {
+        $this->assertNotEquals('key', $this->keyGenerator->createCopyOfKey('key'));
+    }
 }

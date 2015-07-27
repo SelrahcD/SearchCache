@@ -29,6 +29,17 @@ final class HashKeyGenerator implements KeyGenerator
         return md5(serialize($params));
     }
 
+    /**
+     * Creates a copy of key
+     * @param $key
+     * @return mixed
+     */
+    public function createCopyOfKey($key)
+    {
+        return md5($key . uniqid());
+    }
+
+
     private function orderParameters(array &$params)
     {
         ksort($params);

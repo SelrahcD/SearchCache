@@ -16,4 +16,11 @@ interface KeyGenerator
      * @return string
      */
     public function generateSharedKey($params);
+
+    /**
+     * Creates a copy of key
+     * @param $key
+     * @return mixed
+     */
+    public function createCopyOfKey($key);
 }

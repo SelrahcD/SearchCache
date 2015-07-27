@@ -58,12 +58,30 @@ final class SearchCache
      * @param $results
      * @return string
      */
-    public function storeSharedResult($params, $results)
+    public function storeSharedResult(array $params, array $results)
     {
         $key = $this->keyGenerator->generateSharedKey($params);
 
         $this->searchResultsStore->store($key, $results);
 
         return $key;
+    }
+
+    /**
+     * Finds a key for shared result
+     * @param array $params
+     * @return mixed
+     */
+    public function findSharedResult(array $params)
+    {
+        $key = $this->keyGenerator->generateSharedKey($params);
+
+        $result = $this->searchResultsStore->getResult($key);;
+
+        $newKey = $this->keyGenerator->createCopyOfKey($key);
+
+        $this->searchResultsStore->store($newKey, $result);
+
+        return $newKey;
     }
 }
