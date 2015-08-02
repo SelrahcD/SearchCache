@@ -53,7 +53,7 @@ final class PredisSearchResultStore implements SearchResultsStore
             throw new NotFoundSearchResultException;
         }
 
-        return $result;
+        return new SearchResult($key, $result);
     }
 
     /**
@@ -68,6 +68,6 @@ final class PredisSearchResultStore implements SearchResultsStore
             throw new NotFoundSharedSearchResultException;
         }
 
-        return $result;
+        return new SharedSearchResult($key, $result);
     }
 }

@@ -25,7 +25,7 @@ interface SearchResultsStore
     /**
      * Retrieves a result using a key
      * @param $key
-     * @return mixed
+     * @return SearchResult
      * @throws NotFoundSearchResultException if not matching result found
      */
     public function getResult($key);
@@ -33,7 +33,7 @@ interface SearchResultsStore
     /**
      * Retrieves a shared result using key
      * @param $key
-     * @return mixed
+     * @return SharedSearchResult
      * @throws NotFoundSearchResultException if not matching result found
      */
     public function getSharedResult($key);
