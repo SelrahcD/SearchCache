@@ -69,5 +69,14 @@ class PredisSearchResultStoreTest extends \PHPUnit_Framework_TestCase
         $this->resultStore->store('sharedKey', [1,2,3]);
     }
 
+    public function testGetSharedResultStoresReturnsResultMatchingKey()
+    {
+        $this->redisClient
+            ->shouldReceive('smembers')
+            ->with(\Mockery::mustBe('sharedKey'))
+            ->andReturn([1,2,3]);
+
+        $this->assertEquals([1,2,3], $this->resultStore->getSharedResult('sharedKey'));
+    }
 
 }

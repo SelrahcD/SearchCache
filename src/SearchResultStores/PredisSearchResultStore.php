@@ -44,4 +44,12 @@ final class PredisSearchResultStore implements SearchResultsStore
     {
         return $this->client->smembers($key);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSharedResult($key)
+    {
+        return $this->client->smembers($key);
+    }
 }

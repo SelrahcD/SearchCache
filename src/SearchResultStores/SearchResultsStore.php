@@ -26,4 +26,11 @@ interface SearchResultsStore
      * @return mixed
      */
     public function getResult($key);
+
+    /**
+     * Retrieves a shared result using key
+     * @param $key
+     * @return mixed
+     */
+    public function getSharedResult($key);
 }

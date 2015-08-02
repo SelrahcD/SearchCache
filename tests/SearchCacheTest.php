@@ -128,7 +128,7 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->searchResultStore
-            ->shouldReceive('getResult')
+            ->shouldReceive('getSharedResult')
             ->andReturn(array('AA'));
 
         $this->keyGenerator
@@ -149,7 +149,7 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->searchResultStore
-            ->shouldReceive('getResult')
+            ->shouldReceive('getSharedResult')
             ->andReturn(array('AA'));
 
         $this->keyGenerator
@@ -178,7 +178,7 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
         $result = [1, 'AA', 3, "HUG76767"];
 
         $this->searchResultStore
-            ->shouldReceive('getResult')
+            ->shouldReceive('getSharedResult')
             ->andReturn($result);
 
         $this->keyGenerator
@@ -208,7 +208,7 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
             ->andReturn('key1');
 
         $this->searchResultStore
-            ->shouldReceive('getResult')
+            ->shouldReceive('getSharedResult')
             ->andReturn(null);
 
         $this->assertNull($this->searchCache->getCopyOfSharedResult($params));
