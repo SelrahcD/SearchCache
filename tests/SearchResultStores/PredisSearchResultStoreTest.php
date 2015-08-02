@@ -5,6 +5,7 @@ namespace SelrahcD\SearchCache\Tests\SearchResultStores;
 
 use Mockery\Mock;
 use Predis\Client;
+use SelrahcD\SearchCache\Exceptions\NotFoundSearchResultException;
 use SelrahcD\SearchCache\SearchResultStores\PredisSearchResultStore;
 
 class PredisSearchResultStoreTest extends \PHPUnit_Framework_TestCase
@@ -77,6 +78,32 @@ class PredisSearchResultStoreTest extends \PHPUnit_Framework_TestCase
             ->andReturn([1,2,3]);
 
         $this->assertEquals([1,2,3], $this->resultStore->getSharedResult('sharedKey'));
+    }
+
+    /**
+     * @expectedException SelrahcD\SearchCache\Exceptions\NotFoundSearchResultException
+     */
+    public function testGetResultThrowsNotFoundSearchResultExceptionIfCouldNotRetrieveSearchresultFromRedis()
+    {
+        $this->redisClient
+            ->shouldReceive('smembers')
+            ->with(\Mockery::mustBe('key'))
+            ->andReturn(-1);
+
+        $this->assertEquals($this->resultStore->getResult('key'));
+    }
+
+    /**
+     * @expectedException SelrahcD\SearchCache\Exceptions\NotFoundSharedSearchResultException
+     */
+    public function testGetSharedResultThrowsNotFoundSharedSearchResultExceptionIfCouldNotRetrieveSearchresultFromRedis()
+    {
+        $this->redisClient
+            ->shouldReceive('smembers')
+            ->with(\Mockery::mustBe('sharedKey'))
+            ->andReturn(-1);
+
+        $this->assertEquals($this->resultStore->getSharedResult('sharedKey'));
     }
 
 }

@@ -3,6 +3,8 @@
 namespace SelrahcD\SearchCache\SearchResultStores;
 
 use Predis\Client;
+use SelrahcD\SearchCache\Exceptions\NotFoundSearchResultException;
+use SelrahcD\SearchCache\Exceptions\NotFoundSharedSearchResultException;
 use SelrahcD\SearchCache\SearchResultStores;
 
 final class PredisSearchResultStore implements SearchResultsStore
@@ -42,7 +44,14 @@ final class PredisSearchResultStore implements SearchResultsStore
      */
     public function getResult($key)
     {
-        return $this->client->smembers($key);
+        $result = $this->client->smembers($key);
+
+        if($result === -1)
+        {
+            throw new NotFoundSearchResultException;
+        }
+
+        return $result;
     }
 
     /**
@@ -50,6 +59,13 @@ final class PredisSearchResultStore implements SearchResultsStore
      */
     public function getSharedResult($key)
     {
-        return $this->client->smembers($key);
+        $result = $this->client->smembers($key);
+
+        if($result === -1)
+        {
+            throw new NotFoundSharedSearchResultException;
+        }
+
+        return $result;
     }
 }

@@ -2,6 +2,8 @@
 
 namespace SelrahcD\SearchCache\SearchResultStores;
 
+use SelrahcD\SearchCache\Exceptions\NotFoundSearchResultException;
+
 interface SearchResultsStore
 {
     /**
@@ -24,6 +26,7 @@ interface SearchResultsStore
      * Retrieves a result using a key
      * @param $key
      * @return mixed
+     * @throws NotFoundSearchResultException if not matching result found
      */
     public function getResult($key);
 
@@ -31,6 +34,7 @@ interface SearchResultsStore
      * Retrieves a shared result using key
      * @param $key
      * @return mixed
+     * @throws NotFoundSearchResultException if not matching result found
      */
     public function getSharedResult($key);
 }

@@ -213,4 +213,5 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($this->searchCache->getCopyOfSharedResult($params));
     }
+
 }
