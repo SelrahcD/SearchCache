@@ -5,6 +5,7 @@ namespace SelrahcD\SearchCache\SearchResultStores;
 use Predis\Client;
 use SelrahcD\SearchCache\Exceptions\NotFoundSearchResultException;
 use SelrahcD\SearchCache\Exceptions\NotFoundSharedSearchResultException;
+use SelrahcD\SearchCache\SearchResult;
 use SelrahcD\SearchCache\SearchResultStores;
 
 final class PredisSearchResultStore implements SearchResultsStore
@@ -26,9 +27,9 @@ final class PredisSearchResultStore implements SearchResultsStore
     /**
      * @inheritdoc
      */
-    public function store($key, array $results)
+    public function store(SearchResult $searchResult)
     {
-        $this->client->sadd($key, $results);
+        $this->client->sadd($searchResult->getKey(), $searchResult->getResult());
     }
 
     /**

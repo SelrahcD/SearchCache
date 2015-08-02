@@ -7,6 +7,7 @@ use SelrahcD\SearchCache\Exceptions\NotFoundSearchResultException;
 use SelrahcD\SearchCache\Exceptions\NotFoundSharedSearchResultException;
 use SelrahcD\SearchCache\KeyGenerators\KeyGenerator;
 use SelrahcD\SearchCache\SearchCache;
+use SelrahcD\SearchCache\SearchResult;
 use SelrahcD\SearchCache\SearchResultStores\SearchResultsStore;
 
 class SearchCacheTest extends \PHPUnit_Framework_TestCase
@@ -61,8 +62,7 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
             ->shouldReceive('store')
             ->once()
             ->with(
-                \Mockery::mustBe('aKey'),
-                \Mockery::mustBe($result)
+                \Mockery::mustBe(new SearchResult('aKey', $result))
             );
 
         $this->searchCache->storeResult($result);
@@ -190,8 +190,7 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
         $this->searchResultStore
             ->shouldReceive('store')
             ->with(
-                \Mockery::mustBe('newKey'),
-                \Mockery::mustBe($result)
+                \Mockery::mustBe(new SearchResult('newKey', $result))
             );
 
         $this->assertEquals('newKey', $this->searchCache->getCopyOfSharedResult($params));

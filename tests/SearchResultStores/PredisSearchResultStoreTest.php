@@ -6,6 +6,7 @@ namespace SelrahcD\SearchCache\Tests\SearchResultStores;
 use Mockery\Mock;
 use Predis\Client;
 use SelrahcD\SearchCache\Exceptions\NotFoundSearchResultException;
+use SelrahcD\SearchCache\SearchResult;
 use SelrahcD\SearchCache\SearchResultStores\PredisSearchResultStore;
 
 class PredisSearchResultStoreTest extends \PHPUnit_Framework_TestCase
@@ -44,7 +45,7 @@ class PredisSearchResultStoreTest extends \PHPUnit_Framework_TestCase
                 \Mockery::mustBe([1,2,3])
             );
 
-        $this->resultStore->store('key', [1,2,3]);
+        $this->resultStore->store(new SearchResult('key', [1,2,3]));
     }
 
     public function testReturnsResultMatchingKey()
@@ -67,7 +68,7 @@ class PredisSearchResultStoreTest extends \PHPUnit_Framework_TestCase
                 \Mockery::mustBe([1,2,3])
             );
 
-        $this->resultStore->store('sharedKey', [1,2,3]);
+        $this->resultStore->storeSharedResult('sharedKey', [1,2,3]);
     }
 
     public function testGetSharedResultStoresReturnsResultMatchingKey()

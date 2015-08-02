@@ -3,16 +3,16 @@
 namespace SelrahcD\SearchCache\SearchResultStores;
 
 use SelrahcD\SearchCache\Exceptions\NotFoundSearchResultException;
+use SelrahcD\SearchCache\SearchResult;
 
 interface SearchResultsStore
 {
     /**
      * Stores a search result using a key
-     * @param $key
-     * @param array $results
-     * @return mixed
+     * @param SearchResult $searchResult
+     * @return string
      */
-    public function store($key, array $results);
+    public function store(SearchResult $searchResult);
 
     /**
      * Stores a shared result using a key

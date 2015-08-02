@@ -38,7 +38,7 @@ final class SearchCache
     {
         $key = $this->keyGenerator->generateKey();
 
-        $this->searchResultsStore->store($key, $results);
+        $this->searchResultsStore->store(new SearchResult($key, $results));
 
         return $key;
     }
@@ -80,7 +80,7 @@ final class SearchCache
 
         $newKey = $this->keyGenerator->generateKey();
 
-        $this->searchResultsStore->store($newKey, $result);
+        $this->searchResultsStore->store(new SearchResult($newKey, $result));
 
         return $newKey;
     }
