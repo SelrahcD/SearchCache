@@ -85,6 +85,11 @@ final class SearchCache
         return $newKey;
     }
 
+    /**
+     * Test if a shared result is already stored for this set of params
+     * @param array $params
+     * @return bool
+     */
     public function hasSharedResult(array $params)
     {
         $sharedKey = $this->generateSharedKey($params);
