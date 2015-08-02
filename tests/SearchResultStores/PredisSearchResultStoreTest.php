@@ -55,7 +55,7 @@ class PredisSearchResultStoreTest extends \PHPUnit_Framework_TestCase
             ->with(\Mockery::mustBe('key'))
             ->andReturn([1,2,3]);
 
-        $this->assertInstanceOf(SearchResult::class, $this->resultStore->getResult('key'));
+        $this->assertInstanceOf('SelrahcD\SearchCache\SearchResult', $this->resultStore->getResult('key'));
         $this->assertEquals([1,2,3], $this->resultStore->getResult('key')->getResult());
     }
 
@@ -79,7 +79,7 @@ class PredisSearchResultStoreTest extends \PHPUnit_Framework_TestCase
             ->with(\Mockery::mustBe('sharedKey'))
             ->andReturn([1,2,3]);
 
-        $this->assertInstanceOf(SharedSearchResult::class,  $this->resultStore->getSharedResult('sharedKey'));
+        $this->assertInstanceOf('SelrahcD\SearchCache\SharedSearchResult',  $this->resultStore->getSharedResult('sharedKey'));
         $this->assertEquals([1,2,3], $this->resultStore->getSharedResult('sharedKey')->getResult());
     }
 
