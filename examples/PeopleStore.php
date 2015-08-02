@@ -21,6 +21,8 @@ final class PeopleStore
     }
 
     public function search(array $search = array()) {
+        echo 'Searching...';
+
         sleep(1);
         return array_keys(array_filter($this->people, function($person) use($search) {
             if(isset($search['age'])) {

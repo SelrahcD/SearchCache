@@ -29,13 +29,12 @@ final class SearchCache
 
     /**
      * Stores results and returns associated key
-     * @param array $params
      * @param array $results
      * @return string
      */
-    public function storeResult(array $params, array $results)
+    public function storeResult(array $results)
     {
-        $key = $this->keyGenerator->generatePrivateKey($params, $results);
+        $key = $this->keyGenerator->generateKey();
 
         $this->searchResultsStore->store($key, $results);
 
@@ -53,18 +52,16 @@ final class SearchCache
     }
 
     /**
-     * Stores shared results and returns associated key
+     * Stores shared results and returns a key
      * @param $params
      * @param $results
      * @return string
      */
     public function storeSharedResult(array $params, array $results)
     {
-        $key = $this->keyGenerator->generateSharedKey($params);
+        $sharedKey = $this->generateSharedKey($params);
 
-        $this->searchResultsStore->store($key, $results);
-
-        return $key;
+        $this->searchResultsStore->storeSharedResult($sharedKey, $results);
     }
 
     /**
@@ -72,13 +69,13 @@ final class SearchCache
      * @param array $params
      * @return mixed
      */
-    public function findSharedResult(array $params)
+    public function getCopyOfSharedResult(array $params)
     {
-        $key = $this->keyGenerator->generateSharedKey($params);
+        $sharedKey = $this->generateSharedKey($params);
 
-        if($result = $this->searchResultsStore->getResult($key)) {
+        if($result = $this->searchResultsStore->getResult($sharedKey)) {
 
-            $newKey = $this->keyGenerator->createCopyOfKey($key);
+            $newKey = $this->keyGenerator->generateKey();
 
             $this->searchResultsStore->store($newKey, $result);
 
@@ -86,5 +83,26 @@ final class SearchCache
         }
 
         return null;
+    }
+
+    /**
+     * Generates a shared key based on search parameters
+     * @param array $params
+     * @return string
+     */
+    private function generateSharedKey(array $params)
+    {
+        $this->orderParameters($params);
+
+        return md5(serialize($params));
+    }
+
+    /**
+     * Reorders search parameters
+     * @param array $params
+     */
+    private function orderParameters(array &$params)
+    {
+        ksort($params);
     }
 }

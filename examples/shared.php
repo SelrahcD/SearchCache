@@ -2,7 +2,7 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use SelrahcD\SearchCache\KeyGenerators\HashKeyGenerator;
+use SelrahcD\SearchCache\KeyGenerators\UniqidKeyGenerator;
 use SelrahcD\SearchCache\SearchCache;
 use SelrahcD\SearchCache\SearchResultStores\PredisSearchResultStore;
 use Pagerfanta\Adapter\ArrayAdapter;
@@ -13,7 +13,7 @@ $redisConf = include __DIR__ . '/redisconf.php';
 $client = new Predis\Client($redisConf);
 
 $predisSearchStore = new PredisSearchResultStore($client);
-$keyGenerator = new HashKeyGenerator();
+$keyGenerator = new UniqidKeyGenerator();
 $searchCache = new SearchCache($predisSearchStore, $keyGenerator);
 $peopleStore = new PeopleStore();
 
@@ -26,12 +26,13 @@ if (!empty($_GET['search'])) {
         'age' => $_POST['age']
     ];
 
-    if($search = $searchCache->findSharedResult($searchParams)) {
+    if($search = $searchCache->getCopyOfSharedResult($searchParams)) {
         $peopleIds = $searchCache->getResult($search);
     }
     else {
         $peopleIds = $peopleStore->search($searchParams);
-        $search = $searchCache->storeSharedResult($searchParams, $peopleIds);
+        $searchCache->storeSharedResult($searchParams, $peopleIds);
+        $search = $searchCache->getCopyOfSharedResult($searchParams);
     }
 
 } else {

@@ -17,6 +17,9 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
      */
     private $searchCache;
 
+    /**
+     * @var KeyGenerator
+     */
     private $keyGenerator;
 
     /**
@@ -49,9 +52,7 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
         $result = [1, 'AA', 3, "HUG76767"];
 
         $this->keyGenerator
-            ->shouldReceive('generatePrivateKey')
-            ->with(\Mockery::mustBe($params),
-                \Mockery::mustBe($result))
+            ->shouldReceive('generateKey')
             ->andReturn('aKey');
 
         $this->searchResultStore
@@ -62,7 +63,7 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
                 \Mockery::mustBe($result)
             );
 
-        $this->searchCache->storeResult($params, $result);
+        $this->searchCache->storeResult($result);
     }
 
     public function testStoreResultReturnsKey()
@@ -75,15 +76,13 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
         $result = [1, 'AA', 3, "HUG76767"];
 
         $this->keyGenerator
-            ->shouldReceive('generatePrivateKey')
-            ->with(\Mockery::mustBe($params),
-                \Mockery::mustBe($result))
+            ->shouldReceive('generateKey')
             ->andReturn('aKey');
 
         $this->searchResultStore
             ->shouldReceive('store');
 
-        $this->assertEquals('aKey', $this->searchCache->storeResult($params, $result));
+        $this->assertEquals('aKey', $this->searchCache->storeResult($result));
     }
 
     public function testGetResultsReturnsResultsAssociatedWithKey()
@@ -108,69 +107,68 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
         $result = [1, 'AA', 3, "HUG76767"];
 
         $this->keyGenerator
-            ->shouldReceive('generateSharedKey')
-            ->with(\Mockery::mustBe($params))
-            ->andReturn('aKey');
+            ->shouldReceive('generateKey');
 
         $this->searchResultStore
-            ->shouldReceive('store')
+            ->shouldReceive('storeSharedResult')
             ->once()
             ->with(
-                \Mockery::mustBe('aKey'),
+                \Mockery::any(),
                 \Mockery::mustBe($result)
             );
 
         $this->searchCache->storeSharedResult($params, $result);
     }
 
-    public function testStoreSharedResultReturnsKey()
+    public function testGetCopyOfSharedReturnsANewKeyIfAMatchingSearchResultIsStored()
     {
         $params = [
             'name' => 'test',
             'age'  => 12,
         ];
-
-        $result = [1, 'AA', 3, "HUG76767"];
-
-        $this->keyGenerator
-            ->shouldReceive('generateSharedKey')
-            ->with(\Mockery::mustBe($params))
-            ->andReturn('aKey');
-
-        $this->searchResultStore
-            ->shouldReceive('store');
-
-        $this->assertEquals('aKey', $this->searchCache->storeSharedResult($params, $result));
-    }
-
-    public function testFindSharedResultReturnsANewKeyIfAMatchingSearchResultIsStored()
-    {
-        $params = [
-            'name' => 'test',
-            'age'  => 12,
-        ];
-
-        $this->keyGenerator
-            ->shouldReceive('generateSharedKey')
-            ->with(\Mockery::mustBe($params))
-            ->andReturn('key1');
 
         $this->searchResultStore
             ->shouldReceive('getResult')
             ->andReturn(array('AA'));
 
         $this->keyGenerator
-            ->shouldReceive('createCopyOfKey')
-            ->with(\Mockery::mustBe('key1'))
+            ->shouldReceive('generateKey')
             ->andReturn('newKey');
 
         $this->searchResultStore
             ->shouldReceive('store');
 
-        $this->assertEquals('newKey', $this->searchCache->findSharedResult($params));
+        $this->assertEquals('newKey', $this->searchCache->getCopyOfSharedResult($params));
     }
 
-    public function testFindSharedResultStoresResultWithNewKey()
+    public function testGetCopyOfSharedResultReturnsADifferentKeyEachTimeItsCalled()
+    {
+        $params = [
+            'name' => 'test',
+            'age'  => 12,
+        ];
+
+        $this->searchResultStore
+            ->shouldReceive('getResult')
+            ->andReturn(array('AA'));
+
+        $this->keyGenerator
+            ->shouldReceive('generateKey')
+            ->once()
+            ->andReturn('newKey');
+
+        $this->keyGenerator
+            ->shouldReceive('generateKey')
+            ->once()
+            ->andReturn('anOtherNewKey');
+
+        $this->searchResultStore
+            ->shouldReceive('store');
+
+        $this->assertNotEquals($this->searchCache->getCopyOfSharedResult($params), $this->searchCache->getCopyOfSharedResult($params));
+    }
+
+    public function testGetCopyOfSharedResultStoresACopyOfResultWithNewKey()
     {
         $params = [
             'name' => 'test',
@@ -179,18 +177,12 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
 
         $result = [1, 'AA', 3, "HUG76767"];
 
-        $this->keyGenerator
-            ->shouldReceive('generateSharedKey')
-            ->with(\Mockery::mustBe($params))
-            ->andReturn('key1');
-
         $this->searchResultStore
             ->shouldReceive('getResult')
             ->andReturn($result);
 
         $this->keyGenerator
-            ->shouldReceive('createCopyOfKey')
-            ->with(\Mockery::mustBe('key1'))
+            ->shouldReceive('generateKey')
             ->andReturn('newKey');
 
         $this->searchResultStore
@@ -200,10 +192,10 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
                 \Mockery::mustBe($result)
             );
 
-        $this->assertEquals('newKey', $this->searchCache->findSharedResult($params));
+        $this->assertEquals('newKey', $this->searchCache->getCopyOfSharedResult($params));
     }
 
-    public function testFindSharedResultReturnsNullIfNoPreviousResultFound()
+    public function testGetCopyOfSharedResultReturnsNullIfNoPreviousResultFound()
     {
         $params = [
             'name' => 'test',
@@ -211,7 +203,7 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->keyGenerator
-            ->shouldReceive('generateSharedKey')
+            ->shouldReceive('generateKey')
             ->with(\Mockery::mustBe($params))
             ->andReturn('key1');
 
@@ -219,6 +211,6 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
             ->shouldReceive('getResult')
             ->andReturn(null);
 
-        $this->assertNull($this->searchCache->findSharedResult($params));
+        $this->assertNull($this->searchCache->getCopyOfSharedResult($params));
     }
 }
