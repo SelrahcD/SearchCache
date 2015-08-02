@@ -7,6 +7,7 @@ use SelrahcD\SearchCache\Exceptions\NotFoundSearchResultException;
 use SelrahcD\SearchCache\Exceptions\NotFoundSharedSearchResultException;
 use SelrahcD\SearchCache\SearchResult;
 use SelrahcD\SearchCache\SearchResultStores;
+use SelrahcD\SearchCache\SharedSearchResult;
 
 final class PredisSearchResultStore implements SearchResultsStore
 {
@@ -35,9 +36,9 @@ final class PredisSearchResultStore implements SearchResultsStore
     /**
      * @inheritdoc
      */
-    public function storeSharedResult($key, array $results)
+    public function storeSharedResult(SharedSearchResult $searchResult)
     {
-        $this->client->sadd($key, $results);
+        $this->client->sadd($searchResult->getKey(), $searchResult->getResult());
     }
 
     /**

@@ -64,7 +64,7 @@ final class SearchCache
     {
         $sharedKey = $this->generateSharedKey($params);
 
-        $this->searchResultsStore->storeSharedResult($sharedKey, $results);
+        $this->searchResultsStore->storeSharedResult(new SharedSearchResult($sharedKey, $results));
     }
 
     /**

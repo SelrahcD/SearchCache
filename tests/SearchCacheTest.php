@@ -9,6 +9,7 @@ use SelrahcD\SearchCache\KeyGenerators\KeyGenerator;
 use SelrahcD\SearchCache\SearchCache;
 use SelrahcD\SearchCache\SearchResult;
 use SelrahcD\SearchCache\SearchResultStores\SearchResultsStore;
+use SelrahcD\SearchCache\SharedSearchResult;
 
 class SearchCacheTest extends \PHPUnit_Framework_TestCase
 {
@@ -114,10 +115,9 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
         $this->searchResultStore
             ->shouldReceive('storeSharedResult')
             ->once()
-            ->with(
-                \Mockery::any(),
-                \Mockery::mustBe($result)
-            );
+            ->with(\Mockery::on(function($searchResult) use ($result) {
+              return $searchResult->getResult() === $result;
+            }));
 
         $this->searchCache->storeSharedResult($params, $result);
     }
