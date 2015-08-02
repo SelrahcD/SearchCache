@@ -88,7 +88,7 @@ class PredisSearchResultStoreTest extends \PHPUnit_Framework_TestCase
         $this->redisClient
             ->shouldReceive('smembers')
             ->with(\Mockery::mustBe('key'))
-            ->andReturn(-1);
+            ->andReturn(array());
 
         $this->assertEquals($this->resultStore->getResult('key'));
     }
@@ -101,7 +101,7 @@ class PredisSearchResultStoreTest extends \PHPUnit_Framework_TestCase
         $this->redisClient
             ->shouldReceive('smembers')
             ->with(\Mockery::mustBe('sharedKey'))
-            ->andReturn(-1);
+            ->andReturn(array());
 
         $this->assertEquals($this->resultStore->getSharedResult('sharedKey'));
     }

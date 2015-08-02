@@ -46,7 +46,7 @@ final class PredisSearchResultStore implements SearchResultsStore
     {
         $result = $this->client->smembers($key);
 
-        if($result === -1)
+        if(empty($result))
         {
             throw new NotFoundSearchResultException;
         }
@@ -61,7 +61,7 @@ final class PredisSearchResultStore implements SearchResultsStore
     {
         $result = $this->client->smembers($key);
 
-        if($result === -1)
+        if(empty($result))
         {
             throw new NotFoundSharedSearchResultException;
         }

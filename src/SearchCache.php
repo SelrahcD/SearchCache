@@ -2,6 +2,7 @@
 namespace SelrahcD\SearchCache;
 
 use SelrahcD\SearchCache\Exceptions\NotFoundSearchResultException;
+use SelrahcD\SearchCache\Exceptions\NotFoundSharedSearchResultException;
 use SelrahcD\SearchCache\KeyGenerators\KeyGenerator;
 use SelrahcD\SearchCache\SearchResultStores\SearchResultsStore;
 
@@ -82,6 +83,20 @@ final class SearchCache
         $this->searchResultsStore->store($newKey, $result);
 
         return $newKey;
+    }
+
+    public function hasSharedResult(array $params)
+    {
+        $sharedKey = $this->generateSharedKey($params);
+
+        try {
+            $this->searchResultsStore->getSharedResult($sharedKey);
+        }
+        catch(NotFoundSharedSearchResultException $exception) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

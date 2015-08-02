@@ -232,4 +232,31 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
         $this->searchCache->getResult('key');
     }
 
+    public function testHasSharedResultReturnsTrueIfSharedResultIsStored()
+    {
+        $params = [
+            'name' => 'test',
+            'age'  => 12,
+        ];
+
+        $this->searchResultStore
+            ->shouldReceive('getSharedResult');
+
+        $this->assertTrue($this->searchCache->hasSharedResult($params));
+    }
+
+    public function testHasSharedResultReturnsFalseIfNoSharedResultIsStore()
+    {
+        $params = [
+            'name' => 'test',
+            'age'  => 12,
+        ];
+
+        $this->searchResultStore
+            ->shouldReceive('getSharedResult')
+            ->andThrow(new NotFoundSharedSearchResultException);
+
+        $this->assertFalse($this->searchCache->hasSharedResult($params));
+    }
+
 }

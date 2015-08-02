@@ -26,7 +26,8 @@ if (!empty($_GET['search'])) {
         'age' => $_POST['age']
     ];
 
-    if($search = $searchCache->getCopyOfSharedResult($searchParams)) {
+    if($searchCache->hasSharedResult($searchParams)) {
+        $search = $searchCache->getCopyOfSharedResult($searchParams);
         $peopleIds = $searchCache->getResult($search);
     }
     else {
