@@ -3,6 +3,8 @@
 namespace SelrahcD\SearchCache\Tests;
 
 use Mockery\Mock;
+use SelrahcD\SearchCache\Exceptions\NotFoundSearchResultException;
+use SelrahcD\SearchCache\Exceptions\NotFoundSharedSearchResultException;
 use SelrahcD\SearchCache\KeyGenerators\KeyGenerator;
 use SelrahcD\SearchCache\SearchCache;
 use SelrahcD\SearchCache\SearchResultStores\SearchResultsStore;
@@ -195,7 +197,10 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('newKey', $this->searchCache->getCopyOfSharedResult($params));
     }
 
-    public function testGetCopyOfSharedResultReturnsNullIfNoPreviousResultFound()
+    /**
+     * @expectedException SelrahcD\SearchCache\Exceptions\NotFoundSharedSearchResultException
+     */
+    public function testGetCopyOfSharedResultThrowsNotFoundSharedResultExceptionIfNoPreviousResultFound()
     {
         $params = [
             'name' => 'test',
@@ -209,9 +214,22 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
 
         $this->searchResultStore
             ->shouldReceive('getSharedResult')
-            ->andReturn(null);
+            ->andThrow(new NotFoundSharedSearchResultException);
 
-        $this->assertNull($this->searchCache->getCopyOfSharedResult($params));
+        $this->searchCache->getCopyOfSharedResult($params);
+    }
+
+    /**
+     * @expectedException SelrahcD\SearchCache\Exceptions\NotFoundSearchResultException
+     */
+    public function testGetResultThrowsNotFoundSearchResultExceptionIfNoResultFound()
+    {
+        $this->searchResultStore
+            ->shouldReceive('getResult')
+            ->with('key')
+            ->andThrow(new NotFoundSearchResultException);
+
+        $this->searchCache->getResult('key');
     }
 
 }
