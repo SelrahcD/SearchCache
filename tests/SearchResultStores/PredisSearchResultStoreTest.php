@@ -4,7 +4,6 @@ namespace SelrahcD\SearchCache\Tests\SearchResultStores;
 
 
 use Mockery\Mock;
-use Predis\Client;
 use SelrahcD\SearchCache\Exceptions\NotFoundSearchResultException;
 use SelrahcD\SearchCache\SearchResult;
 use SelrahcD\SearchCache\SearchResultStores\PredisSearchResultStore;
@@ -22,7 +21,7 @@ class PredisSearchResultStoreTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->redisClient = \Mockery::mock(Client::class);
+        $this->redisClient = \Mockery::mock('Predis\Client');
         $this->resultStore = new PredisSearchResultStore($this->redisClient);
     }
 

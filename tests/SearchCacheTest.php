@@ -5,10 +5,8 @@ namespace SelrahcD\SearchCache\Tests;
 use Mockery\Mock;
 use SelrahcD\SearchCache\Exceptions\NotFoundSearchResultException;
 use SelrahcD\SearchCache\Exceptions\NotFoundSharedSearchResultException;
-use SelrahcD\SearchCache\KeyGenerators\KeyGenerator;
 use SelrahcD\SearchCache\SearchCache;
 use SelrahcD\SearchCache\SearchResult;
-use SelrahcD\SearchCache\SearchResultStores\SearchResultsStore;
 use SelrahcD\SearchCache\SharedSearchResult;
 
 class SearchCacheTest extends \PHPUnit_Framework_TestCase
@@ -32,8 +30,8 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->searchResultStore = \Mockery::mock(SearchResultsStore::class);
-        $this->keyGenerator = \Mockery::mock(KeyGenerator::class);
+        $this->searchResultStore = \Mockery::mock('SelrahcD\SearchCache\SearchResultStores\SearchResultsStore');
+        $this->keyGenerator = \Mockery::mock('SelrahcD\SearchCache\KeyGenerators\KeyGenerator');
         $this->searchCache = new SearchCache($this->searchResultStore, $this->keyGenerator);
     }
 
