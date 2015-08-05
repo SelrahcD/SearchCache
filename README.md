@@ -8,4 +8,3 @@ A simple cache for search results. Do your heavy search request once and use the
 
 * SharedSearchResult validity TTL
 * SearchResult TTL
-* Avoid possible colision with shared key when used in different search space with same parameters

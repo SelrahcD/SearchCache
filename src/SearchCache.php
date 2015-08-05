@@ -19,14 +19,21 @@ final class SearchCache
     private $keyGenerator;
 
     /**
+     * @var string
+     */
+    private $searchSpace;
+
+    /**
      * SearchCache constructor.
      * @param SearchResultsStore $searchResultsStore
      * @param KeyGenerator $keyGenerator
+     * @param string $searchSpace
      */
-    public function __construct(SearchResultsStore $searchResultsStore, KeyGenerator $keyGenerator)
+    public function __construct(SearchResultsStore $searchResultsStore, KeyGenerator $keyGenerator, $searchSpace = '')
     {
         $this->searchResultsStore = $searchResultsStore;
         $this->keyGenerator = $keyGenerator;
+        $this->searchSpace = $searchSpace;
     }
 
     /**
@@ -113,7 +120,7 @@ final class SearchCache
     {
         $this->orderParameters($params);
 
-        return md5(serialize($params));
+        return md5(serialize($params) . $this->searchSpace);
     }
 
     /**
