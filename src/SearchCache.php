@@ -6,7 +6,7 @@ use SelrahcD\SearchCache\Exceptions\NotFoundSharedSearchResultException;
 use SelrahcD\SearchCache\KeyGenerators\KeyGenerator;
 use SelrahcD\SearchCache\SearchResultStores\SearchResultsStore;
 
-final class SearchCache
+class SearchCache
 {
     /**
      * @var SearchResultsStore
@@ -22,6 +22,11 @@ final class SearchCache
      * @var string
      */
     private $searchSpace;
+
+    /**
+     * @var int
+     */
+    private $searchResultTTL = 600;
 
     /**
      * SearchCache constructor.
@@ -45,7 +50,9 @@ final class SearchCache
     {
         $key = $this->keyGenerator->generateKey();
 
-        $this->searchResultsStore->store(new SearchResult($key, $results));
+        $expirationDate = $this->getSearchResultExpirationDate();
+
+        $this->searchResultsStore->store(new SearchResult($key, $results, $expirationDate));
 
         return $key;
     }
@@ -85,11 +92,7 @@ final class SearchCache
 
         $sharedResult = $this->searchResultsStore->getSharedResult($sharedKey);
 
-        $newKey = $this->keyGenerator->generateKey();
-
-        $this->searchResultsStore->store($sharedResult->createSearchResult($newKey));
-
-        return $newKey;
+        return $this->storeResult($sharedResult->getResult());
     }
 
     /**
@@ -112,6 +115,14 @@ final class SearchCache
     }
 
     /**
+     * @param $searchResultTTL
+     */
+    public function setSearchResultTTL($searchResultTTL)
+    {
+        $this->searchResultTTL = $searchResultTTL;
+    }
+
+    /**
      * Generates a shared key based on search parameters
      * @param array $params
      * @return string
@@ -130,5 +141,21 @@ final class SearchCache
     private function orderParameters(array &$params)
     {
         ksort($params);
+    }
+
+    /**
+     * @return \DateTimeImmutable
+     */
+    private function getSearchResultExpirationDate()
+    {
+        return $this->now()->modify('+' . $this->searchResultTTL . 'second');
+    }
+
+    /**
+     * @return \DateTimeImmutable
+     */
+    protected function now()
+    {
+        return new \DateTimeImmutable();
     }
 }

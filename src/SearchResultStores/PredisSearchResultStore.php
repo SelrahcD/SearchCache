@@ -31,6 +31,7 @@ final class PredisSearchResultStore implements SearchResultsStore
     public function store(SearchResult $searchResult)
     {
         $this->client->sadd($searchResult->getKey(), $searchResult->getResult());
+        $this->client->set('expiration::' . $searchResult->getKey(), $searchResult->getExpirationDate()->format("Y-m-d H:i:s"));
     }
 
     /**
@@ -47,13 +48,14 @@ final class PredisSearchResultStore implements SearchResultsStore
     public function getResult($key)
     {
         $result = $this->client->smembers($key);
+        $expirationDate = $this->client->get('expiration::' . $key);
 
         if(empty($result))
         {
             throw new NotFoundSearchResultException;
         }
 
-        return new SearchResult($key, $result);
+        return new SearchResult($key, $result, new \DateTimeImmutable($expirationDate));
     }
 
     /**

@@ -15,14 +15,21 @@ final class SearchResult
     private $result;
 
     /**
+     * @var \DateTimeImmutable
+     */
+    private $expirationDate;
+
+    /**
      * SearchResult constructor.
      * @param string $key
      * @param array $result
+     * @param \DateTimeImmutable $expirationDate
      */
-    public function __construct($key, array $result)
+    public function __construct($key, array $result, \DateTimeImmutable $expirationDate)
     {
         $this->key = $key;
         $this->result = $result;
+        $this->expirationDate = $expirationDate;
     }
 
     /**
@@ -39,5 +46,22 @@ final class SearchResult
     public function getKey()
     {
         return $this->key;
+    }
+
+    /**
+     * @return \DateTimeImmutable
+     */
+    public function getExpirationDate()
+    {
+        return $this->expirationDate;
+    }
+
+    /**
+     * @param \DateTimeImmutable $testDate
+     * @return bool
+     */
+    public function isValidOn(\DateTimeImmutable $testDate)
+    {
+        return $this->expirationDate > $testDate;
     }
 }

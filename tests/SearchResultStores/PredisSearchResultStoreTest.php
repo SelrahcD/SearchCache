@@ -45,7 +45,14 @@ class PredisSearchResultStoreTest extends \PHPUnit_Framework_TestCase
                 \Mockery::mustBe([1,2,3])
             );
 
-        $this->resultStore->store(new SearchResult('key', [1,2,3]));
+        $this->redisClient->shouldReceive('set')
+            ->once()
+            ->with(
+                \Mockery::mustBe('expiration::key'),
+                \Mockery::mustBe("1989-01-13 15:45:30")
+            );
+
+        $this->resultStore->store(new SearchResult('key', [1,2,3], new \DateTimeImmutable("1989-01-13 15:45:30")));
     }
 
     public function testReturnsResultMatchingKey()
@@ -55,8 +62,14 @@ class PredisSearchResultStoreTest extends \PHPUnit_Framework_TestCase
             ->with(\Mockery::mustBe('key'))
             ->andReturn([1,2,3]);
 
+        $this->redisClient
+            ->shouldReceive('get')
+            ->with(\Mockery::mustBe('expiration::key'))
+            ->andReturn("1989-01-13 15:45:30");
+
         $this->assertInstanceOf('SelrahcD\SearchCache\SearchResult', $this->resultStore->getResult('key'));
         $this->assertEquals([1,2,3], $this->resultStore->getResult('key')->getResult());
+        $this->assertEquals(new \DateTimeImmutable("1989-01-13 15:45:30"), $this->resultStore->getResult('key')->getExpirationDate());
     }
 
     public function testStoreSharedResultStoresResultUsingSharedKey()
@@ -92,6 +105,11 @@ class PredisSearchResultStoreTest extends \PHPUnit_Framework_TestCase
             ->shouldReceive('smembers')
             ->with(\Mockery::mustBe('key'))
             ->andReturn(array());
+
+        $this->redisClient
+            ->shouldReceive('get')
+            ->with(\Mockery::mustBe('expiration::key'))
+            ->andReturn("1989-01-13 15:45:30");
 
         $this->assertEquals($this->resultStore->getResult('key'));
     }

@@ -40,15 +40,4 @@ final class SharedSearchResult
     {
         return $this->result;
     }
-
-    /**
-     * Returns a matching search result
-     * @param $key
-     * @return SearchResult
-     */
-    public function createSearchResult($key)
-    {
-        return new SearchResult($key, $this->getResult());
-    }
-
 }
