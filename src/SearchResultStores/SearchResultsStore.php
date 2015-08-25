@@ -25,8 +25,7 @@ interface SearchResultsStore
     /**
      * Retrieves a result using a key
      * @param $key
-     * @return SearchResult
-     * @throws NotFoundSearchResultException if not matching result found
+     * @return SearchResult | null
      */
     public function getResult($key);
 

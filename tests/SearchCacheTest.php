@@ -234,8 +234,8 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
         $this->searchResultStore
             ->shouldReceive('getResult')
             ->with('key')
-            ->andThrow(new NotFoundSearchResultException);
-
+            ->andReturn(null);
+        
         $this->searchCache->getResult('key');
     }
 

@@ -96,10 +96,7 @@ class PredisSearchResultStoreTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([1,2,3], $this->resultStore->getSharedResult('sharedKey')->getResult());
     }
 
-    /**
-     * @expectedException SelrahcD\SearchCache\Exceptions\NotFoundSearchResultException
-     */
-    public function testGetResultThrowsNotFoundSearchResultExceptionIfCouldNotRetrieveSearchresultFromRedis()
+    public function testGetResultReturnsNullIfCouldNotRetrieveSearchresultFromRedis()
     {
         $this->redisClient
             ->shouldReceive('smembers')
@@ -111,8 +108,24 @@ class PredisSearchResultStoreTest extends \PHPUnit_Framework_TestCase
             ->with(\Mockery::mustBe('expiration::key'))
             ->andReturn("1989-01-13 15:45:30");
 
-        $this->assertEquals($this->resultStore->getResult('key'));
+        $this->assertNull($this->resultStore->getResult('key'));
     }
+
+    public function testGetResultReturnsNullIfCouldNotRetrieveSearchresultExpirationFromRedis()
+    {
+        $this->redisClient
+            ->shouldReceive('smembers')
+            ->with(\Mockery::mustBe('key'))
+            ->andReturn(array('A', 'B'));
+
+        $this->redisClient
+            ->shouldReceive('get')
+            ->with(\Mockery::mustBe('expiration::key'))
+            ->andReturn(null);
+
+        $this->assertNull($this->resultStore->getResult('key'));
+    }
+
 
     /**
      * @expectedException SelrahcD\SearchCache\Exceptions\NotFoundSharedSearchResultException

@@ -65,7 +65,13 @@ class SearchCache
      */
     public function getResult($key)
     {
-        return $this->searchResultsStore->getResult($key)->getResult();
+        $searchResult = $this->searchResultsStore->getResult($key);
+
+        if(!$searchResult)
+        {
+            throw new NotFoundSearchResultException;
+        }
+        return $searchResult->getResult();
     }
 
     /**

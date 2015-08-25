@@ -50,9 +50,9 @@ final class PredisSearchResultStore implements SearchResultsStore
         $result = $this->client->smembers($key);
         $expirationDate = $this->client->get('expiration::' . $key);
 
-        if(empty($result))
+        if(empty($result) || !$expirationDate)
         {
-            throw new NotFoundSearchResultException;
+            return null;
         }
 
         return new SearchResult($key, $result, new \DateTimeImmutable($expirationDate));
