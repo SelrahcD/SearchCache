@@ -94,12 +94,14 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
 
     public function testGetResultsReturnsResultsAssociatedWithKey()
     {
+        $this->setNow(new \DateTimeImmutable('1989-01-13 14:50:17'));
+
         $result = [1, 2, 3];
 
         $this->searchResultStore
             ->shouldReceive('getResult')
             ->with('key')
-            ->andReturn(new SearchResult('key', $result, new \DateTimeImmutable()));
+            ->andReturn(new SearchResult('key', $result, new \DateTimeImmutable('1989-01-13 14:55:17')));
 
         $this->assertTrue(is_array($this->searchCache->getResult('key')));
         $this->assertEquals($result, $this->searchCache->getResult('key'));
@@ -445,6 +447,21 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
             );
 
         $this->searchCache->storeResult($result);
+    }
+
+    /**
+     * @expectedException SelrahcD\SearchCache\Exceptions\NotFoundSearchResultException
+     */
+    public function testGetResultThrowNotFoundSearchResultExceptionIfSearchResultHasExpired()
+    {
+        $this->setNow(new \DateTimeImmutable('1989-01-13 15:50:17'));
+
+        $this->searchResultStore
+            ->shouldReceive('getResult')
+            ->with('key')
+            ->andReturn(new SearchResult('aKey', [], new \DateTimeImmutable('1989-01-13 14:50:20')));
+
+        $this->searchCache->getResult('key');
     }
 
     private function setNow(\DateTimeImmutable $now)

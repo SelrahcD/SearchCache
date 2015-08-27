@@ -67,7 +67,7 @@ class SearchCache
     {
         $searchResult = $this->searchResultsStore->getResult($key);
 
-        if(!$searchResult)
+        if(!$searchResult || !$searchResult->isValidOn($this->now()))
         {
             throw new NotFoundSearchResultException;
         }
