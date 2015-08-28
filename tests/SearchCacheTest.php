@@ -182,7 +182,8 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->searchResultStore
-            ->shouldReceive('getSharedResult');
+            ->shouldReceive('getSharedResult')
+            ->andReturn(new SharedSearchResult('aKey', []));
 
         $this->assertTrue($this->searchCache->hasSharedResult($params));
     }
@@ -196,7 +197,7 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
 
         $this->searchResultStore
             ->shouldReceive('getSharedResult')
-            ->andThrow(new NotFoundSharedSearchResultException);
+            ->andReturn(null);
 
         $this->assertFalse($this->searchCache->hasSharedResult($params));
     }
@@ -358,6 +359,18 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
         $this->storeContainsExpiredResult('key');
 
         $this->searchCache->getResult('key');
+    }
+
+    /**
+     * @expectedException SelrahcD\SearchCache\Exceptions\NotFoundSharedSearchResultException
+     */
+    public function testGetCopyOfSharedResultThrowsNotFoundSharedSearchResultExceptionIfStoreDoesntContainSharedSearchResult()
+    {
+        $this->searchResultStore
+            ->shouldReceive('getSharedResult')
+            ->andReturn(null);
+
+        $this->searchCache->getCopyOfSharedResult([]);
     }
 
     /*************************************

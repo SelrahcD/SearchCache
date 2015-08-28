@@ -126,18 +126,14 @@ class PredisSearchResultStoreTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->resultStore->getResult('key'));
     }
 
-
-    /**
-     * @expectedException SelrahcD\SearchCache\Exceptions\NotFoundSharedSearchResultException
-     */
-    public function testGetSharedResultThrowsNotFoundSharedSearchResultExceptionIfCouldNotRetrieveSearchresultFromRedis()
+    public function testGetSharedResultReturnsNullIfCouldNotRetrieveSearchresultFromRedis()
     {
         $this->redisClient
             ->shouldReceive('smembers')
             ->with(\Mockery::mustBe('sharedKey'))
             ->andReturn(array());
 
-        $this->assertEquals($this->resultStore->getSharedResult('sharedKey'));
+        $this->assertNull($this->resultStore->getSharedResult('sharedKey'));
     }
 
 }

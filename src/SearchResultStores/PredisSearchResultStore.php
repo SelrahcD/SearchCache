@@ -67,7 +67,7 @@ final class PredisSearchResultStore implements SearchResultsStore
 
         if(empty($result))
         {
-            throw new NotFoundSharedSearchResultException;
+            return null;
         }
 
         return new SharedSearchResult($key, $result);

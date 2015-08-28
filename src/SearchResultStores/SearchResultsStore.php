@@ -32,8 +32,7 @@ interface SearchResultsStore
     /**
      * Retrieves a shared result using key
      * @param $key
-     * @return SharedSearchResult
-     * @throws NotFoundSearchResultException if not matching result found
+     * @return SharedSearchResult | null
      */
     public function getSharedResult($key);
 }

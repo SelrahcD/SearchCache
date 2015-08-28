@@ -98,7 +98,10 @@ class SearchCache
     {
         $sharedKey = $this->generateSharedKey($params);
 
-        $sharedResult = $this->searchResultsStore->getSharedResult($sharedKey);
+        if(!$sharedResult = $this->searchResultsStore->getSharedResult($sharedKey))
+        {
+            throw new NotFoundSharedSearchResultException;
+        }
 
         return $this->storeResult($sharedResult->getResult());
     }
@@ -112,14 +115,7 @@ class SearchCache
     {
         $sharedKey = $this->generateSharedKey($params);
 
-        try {
-            $this->searchResultsStore->getSharedResult($sharedKey);
-        }
-        catch(NotFoundSharedSearchResultException $exception) {
-            return false;
-        }
-
-        return true;
+        return $this->searchResultsStore->getSharedResult($sharedKey) !== null;
     }
 
     /**
