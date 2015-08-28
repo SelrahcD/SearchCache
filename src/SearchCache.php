@@ -8,6 +8,8 @@ use SelrahcD\SearchCache\SearchResultStores\SearchResultsStore;
 
 class SearchCache
 {
+    const DEFAULT_SEARCH_RESULT_TTL = 600;
+
     /**
      * @var SearchResultsStore
      */
@@ -26,7 +28,7 @@ class SearchCache
     /**
      * @var int
      */
-    private $searchResultTTL = 600;
+    private $searchResultTTL = self::DEFAULT_SEARCH_RESULT_TTL;
 
     /**
      * SearchCache constructor.
