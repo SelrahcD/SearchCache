@@ -84,7 +84,7 @@ class SearchCache
      */
     public function storeSharedResult(array $params, array $result)
     {
-        $sharedKey = $this->generateSharedKey($params);
+        $sharedKey = $this->getSharedKey($params);
 
         $this->searchResultsStore->storeSharedResult(new SharedSearchResult($sharedKey, $result));
     }
@@ -97,7 +97,7 @@ class SearchCache
      */
     public function getCopyOfSharedResult(array $params)
     {
-        $sharedKey = $this->generateSharedKey($params);
+        $sharedKey = $this->getSharedKey($params);
 
         if(!$sharedResult = $this->searchResultsStore->getSharedResult($sharedKey))
         {
@@ -114,7 +114,7 @@ class SearchCache
      */
     public function hasSharedResult(array $params)
     {
-        $sharedKey = $this->generateSharedKey($params);
+        $sharedKey = $this->getSharedKey($params);
 
         return $this->searchResultsStore->getSharedResult($sharedKey) !== null;
     }
@@ -132,20 +132,11 @@ class SearchCache
      * @param array $params
      * @return string
      */
-    private function generateSharedKey(array $params)
+    private function getSharedKey(array $params)
     {
-        $this->orderParameters($params);
+        $key = new SharedSearchIdentifier($params, $this->searchSpace);
 
-        return md5(serialize($params) . $this->searchSpace);
-    }
-
-    /**
-     * Reorders search parameters
-     * @param array $params
-     */
-    private function orderParameters(array &$params)
-    {
-        ksort($params);
+        return $key->getKey();
     }
 
     /**

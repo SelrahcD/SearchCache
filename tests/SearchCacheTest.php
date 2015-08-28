@@ -5,9 +5,11 @@ namespace SelrahcD\SearchCache\Tests;
 use Mockery\Mock;
 use SelrahcD\SearchCache\Exceptions\NotFoundSearchResultException;
 use SelrahcD\SearchCache\Exceptions\NotFoundSharedSearchResultException;
+use SelrahcD\SearchCache\KeyGenerators\UniqidKeyGenerator;
 use SelrahcD\SearchCache\SearchCache;
 use SelrahcD\SearchCache\SearchResult;
 use SelrahcD\SearchCache\SearchResultStores\SearchResultsStore;
+use SelrahcD\SearchCache\SharedSearchIdentifier;
 use SelrahcD\SearchCache\SharedSearchResult;
 
 class TestableSearchCache extends SearchCache
@@ -55,12 +57,10 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
             $mock->shouldReceive('store')->byDefault();
         });
 
-        $this->keyGenerator = \Mockery::mock('SelrahcD\SearchCache\KeyGenerators\KeyGenerator');
+        $this->keyGenerator = new UniqidKeyGenerator();
         $this->searchCache = new TestableSearchCache($this->searchResultStore, $this->keyGenerator);
 
         $this->setNow(new \DateTimeImmutable(self::NOW));
-
-        $this->keyGeneratorWillGenerateThisKeys(['aKey', 'someOtherKey']);
     }
 
     protected function tearDown()
@@ -72,7 +72,7 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
     {
         $result = [1, 'AA', 3, "HUG76767"];
 
-        $this->storeShouldStore('aKey', $result);
+        $this->storeShouldStore($result);
 
         $this->searchCache->storeResult($result);
     }
@@ -138,11 +138,10 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
         ];
 
         $result = [1, 'AA', 3, "HUG76767"];
-        $this->searchResultStore
-            ->shouldReceive('getSharedResult')
-            ->andReturn(new SharedSearchResult('aSharedKey', $result));
 
-        $this->storeShouldStore('aKey', $result);
+        $this->storeContainsSharedResult($params, $result);
+
+        $this->storeShouldStore($result);
 
         $this->searchCache->getCopyOfSharedResult($params);
     }
@@ -157,9 +156,7 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
             'age'  => 12,
         ];
 
-        $this->searchResultStore
-            ->shouldReceive('getSharedResult')
-            ->andThrow(new NotFoundSharedSearchResultException);
+        $this->storeDoesntContainASharedResultForParams($params);
 
         $this->searchCache->getCopyOfSharedResult($params);
     }
@@ -181,9 +178,7 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
             'age'  => 12,
         ];
 
-        $this->searchResultStore
-            ->shouldReceive('getSharedResult')
-            ->andReturn(new SharedSearchResult('aKey', []));
+        $this->storeContainsSharedResult($params, []);
 
         $this->assertTrue($this->searchCache->hasSharedResult($params));
     }
@@ -195,145 +190,16 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
             'age'  => 12,
         ];
 
-        $this->searchResultStore
-            ->shouldReceive('getSharedResult')
-            ->andReturn(null);
+        $this->storeDoesntContainASharedResultForParams($params);
 
         $this->assertFalse($this->searchCache->hasSharedResult($params));
-    }
-
-    public function testStoringSharedResultSeveralTimesWithSameParametersUseTheSameKey()
-    {
-
-        $params = [
-            'name' => 'test',
-            'age'  => 12,
-        ];
-
-        $result1 = [1, 'AA', 3, "HUG76767"];
-        $result2 = [1, 'AA', 3, "Oho"];
-
-        $this->searchResultStore
-            ->shouldReceive('storeSharedResult')
-            ->once()
-            ->with(\Mockery::on(function($searchResult) use (&$key1, $result1) {
-                if($searchResult->getResult() == $result1) {
-                    $key1 = $searchResult->getKey();
-                    return true;
-                }
-                return false;
-            }));
-
-        $this->searchCache->storeSharedResult($params, $result1);
-
-        $this->searchResultStore
-            ->shouldReceive('storeSharedResult')
-            ->once()
-            ->with(\Mockery::on(function($searchResult) use (&$key2, $result2) {
-                if($searchResult->getResult() == $result2) {
-                    $key2 = $searchResult->getKey();
-                    return true;
-                }
-                return false;
-            }));
-
-        $this->searchCache->storeSharedResult($params, $result2);
-
-        $this->assertEquals($key1, $key2);
-    }
-
-    public function testStoringSharedResultWithSameParametersInDifferentSearchSpaceDoesntUseSameSharedKey()
-    {
-        $searchCache1 = new SearchCache($this->searchResultStore, $this->keyGenerator, 'poney');
-        $searchCache2 = new SearchCache($this->searchResultStore, $this->keyGenerator, 'chat');
-
-        $params = [
-            'name' => 'test',
-            'age'  => 12,
-        ];
-
-        $result1 = [1, 'AA', 3, "HUG76767"];
-        $result2 = [1, 'AA', 3, "AAA"];
-
-        $this->searchResultStore
-            ->shouldReceive('storeSharedResult')
-            ->once()
-            ->with(\Mockery::on(function($searchResult) use (&$key1, $result1) {
-                if($searchResult->getResult() == $result1) {
-                    $key1 = $searchResult->getKey();
-                    return true;
-                }
-                return false;
-            }));
-
-        $searchCache1->storeSharedResult($params, $result1);
-
-        $this->searchResultStore
-            ->shouldReceive('storeSharedResult')
-            ->once()
-            ->with(\Mockery::on(function($searchResult) use (&$key2, $result2) {
-                if($searchResult->getResult() == $result2) {
-                    $key2 = $searchResult->getKey();
-                    return true;
-                }
-                return false;
-            }));
-
-        $searchCache2->storeSharedResult($params, $result2);
-
-        $this->assertNotEquals($key1, $key2);
-    }
-
-    public function testStoringSharedResultWithSameParametersInTheSameSearchSpaceUsesTheSameKey()
-    {
-        $searchCache1 = new SearchCache($this->searchResultStore, $this->keyGenerator, 'poney');
-        $searchCache2 = new SearchCache($this->searchResultStore, $this->keyGenerator, 'poney');
-
-        $params = [
-            'name' => 'test',
-            'age'  => 12,
-        ];
-
-        $result1 = [1, 'AA', 3, "HUG76767"];
-        $result2 = [1, 'AA', 3, "AAA"];
-
-        $key1 = "AA";
-        $key2 = "BB";
-
-        $this->searchResultStore
-            ->shouldReceive('storeSharedResult')
-            ->once()
-            ->with(\Mockery::on(function($searchResult) use (&$key1, $result1) {
-                if($searchResult->getResult() == $result1) {
-                    $key1 = $searchResult->getKey();
-                    return true;
-                }
-                return false;
-            }));
-
-        $searchCache1->storeSharedResult($params, $result1);
-
-        $this->searchResultStore
-            ->shouldReceive('storeSharedResult')
-            ->once()
-            ->with(\Mockery::on(function($searchResult) use (&$key2, $result2) {
-                if($searchResult->getResult() == $result2) {
-                    $key2 = $searchResult->getKey();
-                    return true;
-                }
-                return false;
-            }));
-
-        $searchCache2->storeSharedResult($params, $result2);
-
-        $this->assertEquals($key1, $key2);
     }
 
     public function testStoreResultStoresResultWithExpirationDateSetWithDefaultTTLIfNoneProvided()
     {
         $result = [1, 'AA', 3, "HUG76767"];
 
-        $this->storeShouldStore('aKey', $result);
+        $this->storeShouldStore($result);
 
         $this->searchCache->storeResult($result);
     }
@@ -346,7 +212,7 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
 
         $this->searchCache->setSearchResultTTL($overwriteTTL);
 
-        $this->storeShouldStore('aKey', $result, $overwriteTTL);
+        $this->storeShouldStore($result, $overwriteTTL);
 
         $this->searchCache->storeResult($result);
     }
@@ -366,9 +232,7 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetCopyOfSharedResultThrowsNotFoundSharedSearchResultExceptionIfStoreDoesntContainSharedSearchResult()
     {
-        $this->searchResultStore
-            ->shouldReceive('getSharedResult')
-            ->andReturn(null);
+        $this->storeDoesntContainASharedResultForParams([]);
 
         $this->searchCache->getCopyOfSharedResult([]);
     }
@@ -380,13 +244,6 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
     private function setNow(\DateTimeImmutable $now)
     {
         $this->searchCache->setNow($now);
-    }
-
-    private function keyGeneratorWillGenerateThisKeys(array $keys)
-    {
-        $this->keyGenerator
-            ->shouldReceive('generateKey')
-            ->andReturnValues($keys);
     }
 
     /**
@@ -415,22 +272,6 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
     /**
      * @param $result
      */
-    private function storeShouldStore($key, $result, $ttl = SearchCache::DEFAULT_SEARCH_RESULT_TTL)
-    {
-        $expirationDate = new \DateTimeImmutable(self::NOW);
-        $expirationDate = $expirationDate->modify('+' . $ttl . 'second');
-
-        $this->searchResultStore
-            ->shouldReceive('store')
-            ->once()
-            ->with(
-                \Mockery::mustBe(new SearchResult($key, $result, $expirationDate))
-            );
-    }
-
-    /**
-     * @param $result
-     */
     private function shouldStoreSharedResult($result)
     {
         $this->searchResultStore
@@ -443,9 +284,12 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
 
     private function storeContainsSharedResult($params, $result)
     {
+        $key = new SharedSearchIdentifier($params);
+
         $this->searchResultStore
             ->shouldReceive('getSharedResult')
-            ->andReturn(new SharedSearchResult('aSharedKey', $result));
+            ->with($key->getKey())
+            ->andReturn(new SharedSearchResult($key->getKey(), $result));
     }
 
     private function storeDoesntContainSearchResultWithKey($key)
@@ -453,6 +297,33 @@ class SearchCacheTest extends \PHPUnit_Framework_TestCase
         $this->searchResultStore
             ->shouldReceive('getResult')
             ->with($key)
+            ->andReturn(null);
+    }
+
+    private function storeShouldStore($expectedResult, $ttl = SearchCache::DEFAULT_SEARCH_RESULT_TTL)
+    {
+        $expirationDate = new \DateTimeImmutable(self::NOW);
+        $expirationDate = $expirationDate->modify('+' . $ttl . 'second');
+
+        $this->searchResultStore
+            ->shouldReceive('store')
+            ->once()
+            ->with(
+                \Mockery::on(
+                    function($storedResult) use($expectedResult, $expirationDate) {
+                         return $storedResult->getResult() == $expectedResult
+                            && $storedResult->getExpirationDate() == $expirationDate;
+                })
+            );
+    }
+
+    private function storeDoesntContainASharedResultForParams(array $params)
+    {
+        $key = new SharedSearchIdentifier($params);
+
+        $this->searchResultStore
+            ->shouldReceive('getSharedResult')
+            ->with($key->getKey())
             ->andReturn(null);
     }
 }
