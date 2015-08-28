@@ -93,6 +93,7 @@ class SearchCache
      * Finds a key for shared result
      * @param array $params
      * @return mixed
+     * @throws NotFoundSharedSearchResultException
      */
     public function getCopyOfSharedResult(array $params)
     {
