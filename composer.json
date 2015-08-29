@@ -29,11 +29,10 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "SelrahcD\\SearchCache\\Test\\": "tests"
+      "SelrahcD\\SearchCache\\Tests\\": "tests"
     },
     "files": [
       "examples/PeopleStore.php"
-
     ]
   },
   "extra": {
